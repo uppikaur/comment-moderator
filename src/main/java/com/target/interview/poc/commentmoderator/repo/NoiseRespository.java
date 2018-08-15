@@ -1,26 +1,24 @@
 package com.target.interview.poc.commentmoderator.repo;
 
 import com.target.interview.poc.commentmoderator.data.CommentValidationResponse;
+import com.target.interview.poc.commentmoderator.data.dboperations.NoiseBlackListResponse;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
 @Repository
 public class NoiseRespository {
 
-    List<String> severeNoise = new ArrayList<>();
+    Set<String> severeNoise = new HashSet<>();
 
     {
         severeNoise.add("ugly");
     }
 
-    List<String> moderateNoise = new ArrayList<>();
+    Set<String> moderateNoise = new HashSet<>();
 
     {
         moderateNoise.add("bad");
@@ -42,6 +40,57 @@ public class NoiseRespository {
 
         response.setModerate(matchingModerate);
         response.setSevere(matchingSevere);
+
+        return response;
+    }
+
+    public List<NoiseBlackListResponse> addBlackList(String type, List<String> list)
+    {
+        List<NoiseBlackListResponse> response =null;
+
+        if("severe".equalsIgnoreCase(type))
+            response = addToBlackList(type, severeNoise, list);
+        else
+            response = addToBlackList(type, moderateNoise, list);
+
+        return response;
+    }
+
+    private List<NoiseBlackListResponse> addToBlackList(String type, Set<String> severeNoise, List<String> list) {
+
+        List<NoiseBlackListResponse> response = new ArrayList<>(list.size());
+
+        for(String noise:list)
+        {
+            NoiseBlackListResponse noiseOperationResponse =  new NoiseBlackListResponse();
+            noiseOperationResponse.setNoise(noise);
+            noiseOperationResponse.setType(type);
+
+            if(severeNoise.add(noise))
+            {
+                noiseOperationResponse.setNoiseId(UUID.randomUUID());
+            }
+            else
+            {
+                noiseOperationResponse.setError("Already exists!");
+            }
+
+            response.add(noiseOperationResponse);
+        }
+
+        return response;
+    }
+
+    public List<NoiseBlackListResponse> updateBlackList(String type, List<String> list)
+    {
+        List<NoiseBlackListResponse> response = null;
+
+        return response;
+    }
+
+    public List<NoiseBlackListResponse> deleteNoise(String type, List<String> list)
+    {
+        List<NoiseBlackListResponse> response = null;
 
         return response;
     }
