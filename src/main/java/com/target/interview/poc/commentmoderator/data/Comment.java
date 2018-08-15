@@ -6,9 +6,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.UUID;
 
-/**
- * Created by m0m0180 on 8/15/18.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "commentId",
