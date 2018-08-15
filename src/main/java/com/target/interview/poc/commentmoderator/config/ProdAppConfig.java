@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile("production")
-public class AppConfig {
+public class ProdAppConfig {
 
 
 }

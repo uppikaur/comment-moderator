@@ -1,23 +1,24 @@
-package com.target.interview.poc.commentmoderator;
+package com.target.interview.poc.commentmoderator.mapper;
 
+import com.target.interview.poc.commentmoderator.constants.DataBaseConstats;
 import com.target.interview.poc.commentmoderator.data.CommentValidationResponse;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Created by m0m0180 on 8/15/18.
- */
-public class BlackListMapper implements RowMapper<CommentValidationResponse> {
+@Component
+public class BlackListMapper implements RowMapper<NoiseDaoTO> {
 
     @Nullable
     @Override
-    public CommentValidationResponse mapRow(ResultSet resultSet, int i) throws SQLException {
+    public NoiseDaoTO mapRow(ResultSet resultSet, int i) throws SQLException {
 
-        CommentValidationResponse commentValidationResponse = new CommentValidationResponse();
-
-        return null;
+        NoiseDaoTO commentValidationResponse = new NoiseDaoTO();
+        commentValidationResponse.setName(resultSet.getString(DataBaseConstats.NOISE_NAME));
+        commentValidationResponse.setType(resultSet.getString(DataBaseConstats.NOISE_TYPE));
+        return commentValidationResponse;
     }
 }

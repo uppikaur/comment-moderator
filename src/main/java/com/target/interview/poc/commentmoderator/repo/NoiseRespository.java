@@ -1,10 +1,19 @@
 package com.target.interview.poc.commentmoderator.repo;
 
+import com.target.interview.poc.commentmoderator.constants.AppConstants;
+import com.target.interview.poc.commentmoderator.constants.DataBaseConstats;
+import com.target.interview.poc.commentmoderator.constants.DataBaseQueryConstants;
 import com.target.interview.poc.commentmoderator.data.CommentValidationResponse;
 import com.target.interview.poc.commentmoderator.data.dboperations.NoiseBlackListResponse;
+import com.target.interview.poc.commentmoderator.mapper.BlackListMapper;
+import com.target.interview.poc.commentmoderator.mapper.NoiseDaoTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import javax.sql.DataSource;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -12,36 +21,52 @@ import static java.util.stream.Collectors.toList;
 @Repository
 public class NoiseRespository {
 
-    Set<String> severeNoise = new HashSet<>();
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
-    {
-        severeNoise.add("ugly");
-    }
+    @Autowired
+    private BlackListMapper blackListMapper;
 
-    Set<String> moderateNoise = new HashSet<>();
-
-    {
-        moderateNoise.add("bad");
-    }
+    private Set<String> severeNoise;
+    private Set<String> moderateNoise;
 
 
     public CommentValidationResponse findMatchingNoise(String comment)
     {
         String[] split = comment.split(" ");
         List<String> allWords = Arrays.asList(split);
+
         CommentValidationResponse response = new CommentValidationResponse();
 
-        List<String> matchingSevere = locateNoise(allWords, new ArrayList<>(severeNoise));
-        List<String> matchingModerate = locateNoise(allWords, new ArrayList<>(moderateNoise));
+        String sql = DataBaseQueryConstants.FIND_NOISE;
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        paramMap.addValue(DataBaseConstats.NOISE_NAME, allWords);
 
-        if(!CollectionUtils.isEmpty(matchingSevere)||!CollectionUtils.isEmpty(matchingModerate)) {
-            response.setValid(true);
-        }
+        List<NoiseDaoTO> responseNoise = jdbcTemplate.query(sql, paramMap, blackListMapper);
+
+        List<String> matchingSevere = new ArrayList<>();
+        List<String> matchingModerate = new ArrayList<>();
+
+        filterNoise(response, responseNoise, matchingSevere, matchingModerate);
 
         response.setModerate(matchingModerate);
         response.setSevere(matchingSevere);
 
         return response;
+    }
+
+    private void filterNoise(CommentValidationResponse response,
+            List<NoiseDaoTO> responseNoise, List<String> matchingSevere, List<String> matchingModerate) {
+
+        for (NoiseDaoTO noiseDao:responseNoise) {
+
+            response.setValid(true);
+
+            if(AppConstants.SEVERE.equalsIgnoreCase(noiseDao.getType()))
+                matchingSevere.add(noiseDao.getName());
+            else
+                matchingModerate.add(noiseDao.getName());
+        }
     }
 
     public List<NoiseBlackListResponse> addBlackList(String type, List<String> list)
