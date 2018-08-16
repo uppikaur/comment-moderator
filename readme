@@ -1,0 +1,70 @@
+GET
+
+http://localhost:8080/comments/validate
+
+Request
+
+{
+	"commentId":"626db138-370b-4f21-b9aa-7a491dd407e3",
+	"comment":"this is my first worse ugly extra comment"
+}
+
+Response
+
+{
+  "valid": true,
+  "severe": [
+    "worse"
+  ],
+  "moderate": [
+    "ugly"
+  ]
+}
+
+
+
+ADD
+
+http://localhost:8080/noise/add
+
+Request
+
+{
+   "type":"severe",
+   "noiseList": ["extra","less"]
+}
+
+Response
+
+[
+  {
+    "noisetId": "18514c56-c535-4f69-9802-9fa6cf4e0d71",
+    "type": "severe",
+    "noise": "extra"
+  },
+  {
+    "noisetId": "03b8b385-50cd-4c85-aa81-a380db8e4b43",
+    "type": "severe",
+    "noise": "less"
+  }
+]
+
+DELETE
+
+http://localhost:8080/noise/delete
+
+Request
+
+{
+   "type":"severe",
+   "noiseList": ["extra"]
+}
+
+Response
+
+[
+  {
+    "type": "severe",
+    "noise": "extra"
+  }
+]
