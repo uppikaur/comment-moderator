@@ -27,10 +27,6 @@ public class NoiseRespository {
     @Autowired
     private BlackListMapper blackListMapper;
 
-    private Set<String> severeNoise;
-    private Set<String> moderateNoise;
-
-
     public CommentValidationResponse findMatchingNoise(String comment)
     {
         String[] split = comment.split(" ");
@@ -74,14 +70,14 @@ public class NoiseRespository {
         List<NoiseBlackListResponse> response =null;
 
         if("severe".equalsIgnoreCase(type))
-            response = addToBlackList(type, severeNoise, list);
+            response = addToBlackList(type, list);
         else
-            response = addToBlackList(type, moderateNoise, list);
+            response = addToBlackList(type, list);
 
         return response;
     }
 
-    private List<NoiseBlackListResponse> addToBlackList(String type, Set<String> severeNoise, List<String> list) {
+    private List<NoiseBlackListResponse> addToBlackList(String type, List<String> list) {
 
         List<NoiseBlackListResponse> response = new ArrayList<>(list.size());
 
@@ -90,12 +86,19 @@ public class NoiseRespository {
             NoiseBlackListResponse noiseOperationResponse =  new NoiseBlackListResponse();
             noiseOperationResponse.setNoise(noise);
             noiseOperationResponse.setType(type);
+            noiseOperationResponse.setNoiseId(UUID.randomUUID());
 
-            if(severeNoise.add(noise))
+            String sql = DataBaseQueryConstants.INSERT_NOISE;
+            MapSqlParameterSource paramMap = new MapSqlParameterSource();
+            paramMap.addValue(DataBaseConstats.NOISE_NAME, noise);
+            paramMap.addValue(DataBaseConstats.ID, noiseOperationResponse.getNoiseId());
+            paramMap.addValue(DataBaseConstats.NOISE_TYPE, type);
+
+            try
             {
-                noiseOperationResponse.setNoiseId(UUID.randomUUID());
+                jdbcTemplate.update(sql,paramMap);
             }
-            else
+            catch (Exception e)
             {
                 noiseOperationResponse.setError("Already exists!");
             }
@@ -106,16 +109,32 @@ public class NoiseRespository {
         return response;
     }
 
-    public List<NoiseBlackListResponse> updateBlackList(String type, List<String> list)
-    {
-        List<NoiseBlackListResponse> response = null;
-
-        return response;
-    }
 
     public List<NoiseBlackListResponse> deleteNoise(String type, List<String> list)
     {
-        List<NoiseBlackListResponse> response = null;
+        List<NoiseBlackListResponse> response = new ArrayList<>(list.size());
+
+        for(String noise:list)
+        {
+            NoiseBlackListResponse noiseOperationResponse =  new NoiseBlackListResponse();
+            noiseOperationResponse.setNoise(noise);
+            noiseOperationResponse.setType(type);
+
+            String sql = DataBaseQueryConstants.DELETE_NOISE;
+            MapSqlParameterSource paramMap = new MapSqlParameterSource();
+            paramMap.addValue(DataBaseConstats.NOISE_NAME, noise);
+
+            try
+            {
+                jdbcTemplate.update(sql,paramMap);
+            }
+            catch (Exception e)
+            {
+                noiseOperationResponse.setError("Already exists!");
+            }
+
+            response.add(noiseOperationResponse);
+        }
 
         return response;
     }

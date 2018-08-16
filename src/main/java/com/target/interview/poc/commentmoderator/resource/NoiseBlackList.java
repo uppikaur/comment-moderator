@@ -28,17 +28,8 @@ public class NoiseBlackList {
 
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public @ResponseBody
-    ResponseEntity<List<NoiseBlackListResponse>> updateNoise(@RequestBody NoiseBlackListRequest request)
-    {
-        List<NoiseBlackListResponse> response =
-                noiseRespository.updateBlackList(request.getType(),request.getNoiseList());
-        return ResponseEntity.ok().body(response);
 
-    }
-
-    @RequestMapping(value = "/delete", method = RequestMethod.PUT)
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public @ResponseBody
     ResponseEntity<List<NoiseBlackListResponse>> deleteNoise(@RequestBody NoiseBlackListRequest request)
     {
