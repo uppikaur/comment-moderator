@@ -38,4 +38,13 @@ public class Comment {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Comment{");
+        sb.append("commentId=").append(commentId);
+        sb.append(", comment='").append(comment).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

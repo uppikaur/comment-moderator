@@ -52,4 +52,15 @@ public class CommentValidationResponse {
     public void setModerate(List<String> moderate) {
         this.moderate = moderate;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb =
+                new StringBuilder("CommentValidationResponse{");
+        sb.append("valid=").append(valid);
+        sb.append(", severe=").append(severe);
+        sb.append(", moderate=").append(moderate);
+        sb.append('}');
+        return sb.toString();
+    }
 }
